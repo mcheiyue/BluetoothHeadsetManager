@@ -16,7 +16,7 @@ namespace BluetoothHeadsetManager.Models
         /// <summary>
         /// 最后连接的设备ID
         /// </summary>
-        public string LastConnectedDeviceId { get; set; }
+        public string LastConnectedDeviceId { get; set; } = string.Empty;
 
         /// <summary>
         /// 是否开机自动启动
