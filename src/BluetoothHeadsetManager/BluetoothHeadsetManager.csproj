@@ -2,11 +2,14 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <!-- 图标文件稍后添加 -->
+    <!-- <ApplicationIcon>Resources\icon.ico</ApplicationIcon> -->
     
     <!-- 应用程序信息 -->
     <AssemblyName>BluetoothHeadsetManager</AssemblyName>
@@ -19,15 +22,12 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <PublishTrimmed>true</PublishTrimmed>
-    <TrimMode>link</TrimMode>
+    <!-- WinForms 不支持 Trimming，禁用以避免错误 -->
+    <PublishTrimmed>false</PublishTrimmed>
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Windows Runtime API for Bluetooth -->
-    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.22621.38" />
-    
     <!-- JSON 配置支持 -->
     <PackageReference Include="System.Text.Json" Version="7.0.0" />
   </ItemGroup>
