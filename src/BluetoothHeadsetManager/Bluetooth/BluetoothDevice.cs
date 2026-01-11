@@ -16,6 +16,11 @@ namespace BluetoothHeadsetManager.Bluetooth
         private bool _disposed = false;
 
         /// <summary>
+        /// 连接状态变化事件
+        /// </summary>
+        public event EventHandler<BluetoothConnectionStatus>? ConnectionStatusChanged;
+
+        /// <summary>
         /// 设备信息
         /// </summary>
         public DeviceInfo DeviceInfo { get; private set; }
@@ -24,6 +29,21 @@ namespace BluetoothHeadsetManager.Bluetooth
         /// Windows 蓝牙设备对象
         /// </summary>
         public Windows.Devices.Bluetooth.BluetoothDevice? NativeDevice => _device;
+
+        /// <summary>
+        /// 设备ID
+        /// </summary>
+        public string Id => DeviceInfo.Id;
+
+        /// <summary>
+        /// 设备名称
+        /// </summary>
+        public string Name => DeviceInfo.Name;
+
+        /// <summary>
+        /// 连接状态
+        /// </summary>
+        public BluetoothConnectionStatus ConnectionStatus => _device?.ConnectionStatus ?? BluetoothConnectionStatus.Disconnected;
 
         /// <summary>
         /// 是否已连接
@@ -64,6 +84,9 @@ namespace BluetoothHeadsetManager.Bluetooth
                 {
                     _device = device
                 };
+
+                // 订阅连接状态变化事件
+                device.ConnectionStatusChanged += wrapper.OnNativeDeviceConnectionStatusChanged;
 
                 Logger.Info($"蓝牙设备创建成功: {device.Name} ({deviceInfo.Address})");
                 return wrapper;
@@ -107,6 +130,9 @@ namespace BluetoothHeadsetManager.Bluetooth
                 {
                     _device = device
                 };
+
+                // 订阅连接状态变化事件
+                device.ConnectionStatusChanged += wrapper.OnNativeDeviceConnectionStatusChanged;
 
                 return wrapper;
             }
@@ -193,6 +219,27 @@ namespace BluetoothHeadsetManager.Bluetooth
         }
 
         /// <summary>
+        /// 处理原生设备连接状态变化
+        /// </summary>
+        private void OnNativeDeviceConnectionStatusChanged(Windows.Devices.Bluetooth.BluetoothDevice sender, object args)
+        {
+            try
+            {
+                var newStatus = sender.ConnectionStatus;
+                DeviceInfo.IsConnected = newStatus == BluetoothConnectionStatus.Connected;
+                
+                Logger.Info($"设备连接状态变化: {Name} -> {newStatus}");
+                
+                // 触发事件
+                ConnectionStatusChanged?.Invoke(this, newStatus);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"处理连接状态变化失败: {Name}", ex);
+            }
+        }
+
+        /// <summary>
         /// 格式化蓝牙地址
         /// </summary>
         private static string FormatBluetoothAddress(ulong address)
@@ -221,6 +268,12 @@ namespace BluetoothHeadsetManager.Bluetooth
                 {
                     try
                     {
+                        // 取消订阅事件
+                        if (_device != null)
+                        {
+                            _device.ConnectionStatusChanged -= OnNativeDeviceConnectionStatusChanged;
+                        }
+                        
                         _device?.Dispose();
                         _device = null;
                         Logger.Debug($"BluetoothDevice资源已释放: {DeviceInfo.Name}");
