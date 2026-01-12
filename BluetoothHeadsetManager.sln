@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1DEF544A-B63D-4000-8B7F-A006D23AF758}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D296599C-F52E-4D80-B45D-FF6E340E900D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothHeadsetManager", "src\BluetoothHeadsetManager\BluetoothHeadsetManager.csproj", "{5B24210E-275D-49E4-9B24-C1CB01DF433B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluetoothHeadsetManager", "src\BluetoothHeadsetManager\BluetoothHeadsetManager.csproj", "{592ADB6A-5E77-4C22-A166-7DAE82DF1D97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,12 +16,12 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5B24210E-275D-49E4-9B24-C1CB01DF433B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B24210E-275D-49E4-9B24-C1CB01DF433B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B24210E-275D-49E4-9B24-C1CB01DF433B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B24210E-275D-49E4-9B24-C1CB01DF433B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{592ADB6A-5E77-4C22-A166-7DAE82DF1D97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{592ADB6A-5E77-4C22-A166-7DAE82DF1D97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{592ADB6A-5E77-4C22-A166-7DAE82DF1D97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{592ADB6A-5E77-4C22-A166-7DAE82DF1D97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{5B24210E-275D-49E4-9B24-C1CB01DF433B} = {1DEF544A-B63D-4000-8B7F-A006D23AF758}
+		{592ADB6A-5E77-4C22-A166-7DAE82DF1D97} = {D296599C-F52E-4D80-B45D-FF6E340E900D}
 	EndGlobalSection
 EndGlobal

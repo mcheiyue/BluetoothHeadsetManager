@@ -1,112 +1,94 @@
 # 蓝牙耳机管理器 (Bluetooth Headset Manager)
 
-一个轻量级的 Windows 系统托盘工具，用于快速连接/断开蓝牙耳机并实时显示电量。
+一个轻量级的 Windows 蓝牙耳机管理工具，支持快速连接/断开、电量显示、音频自动切换等功能。
 
-## 项目特点
+## ✨ 功能特性
 
-- ✅ **轻量级**：可执行文件 < 10MB，内存占用 < 30MB
-- ⚡ **快速响应**：连接操作 < 3秒
-- 🔋 **电量显示**：实时显示耳机电量
-- 🎯 **一键操作**：托盘图标一键连接/断开
-- 🔧 **易于扩展**：模块化设计，便于功能扩展
+- 🎧 **快速连接/断开** - 托盘右键菜单一键操作，比系统自带快3倍
+- 🔋 **电量显示** - 实时显示蓝牙设备电量（支持经典蓝牙和BLE设备）
+- 🔊 **音频自动切换** - 连接后自动将音频输出切换到蓝牙设备
+- ⌨️ **全局热键** - Ctrl+Shift+B 快速连接/断开，Ctrl+Shift+R 刷新设备列表
+- 🖥️ **托盘常驻** - 最小化到系统托盘，不占用任务栏空间
 
-## 技术栈
+## 🛠️ 技术栈
 
-- **框架**: .NET 7 + Windows Forms
-- **语言**: C#
-- **开发工具**: Visual Studio Code
-- **目标平台**: Windows 10/11
+- **框架**: .NET 7 + WPF
+- **UI**: Windows 原生托盘图标 (Hardcodet.NotifyIcon.Wpf)
+- **MVVM**: CommunityToolkit.Mvvm
+- **蓝牙**: InTheHand.Net.Bluetooth (32feet)
+- **音频**: NAudio.CoreAudioApi
 
-## 系统要求
+## 📦 安装
 
-- Windows 10 1809 或更高版本
-- .NET 7.0 Runtime（或 SDK）
-- 蓝牙适配器
+### 从源码编译
 
-## 开发环境配置
+1. 确保已安装 [.NET 7 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
+2. 克隆仓库：
+   ```bash
+   git clone https://github.com/yourusername/BluetoothHeadsetManager.git
+   cd BluetoothHeadsetManager
+   ```
+3. 编译运行：
+   ```bash
+   cd src/BluetoothHeadsetManager
+   dotnet run
+   ```
 
-请参阅 [`docs/setup-guide.md`](docs/setup-guide.md) 获取详细的环境配置说明。
+## 🚀 使用方法
 
-### 快速开始
+1. 启动程序后，图标会出现在系统托盘
+2. 右键点击托盘图标，查看已配对的蓝牙设备列表
+3. 点击设备名称即可连接/断开
+4. 使用热键 `Ctrl+Shift+B` 快速操作第一个音频设备
 
-1. 克隆仓库
-```bash
-git clone <repository-url>
-cd BluetoothHeadsetManager
-```
+## ⌨️ 快捷键
 
-2. 安装依赖
-```bash
-dotnet restore
-```
+| 快捷键 | 功能 |
+|--------|------|
+| Ctrl+Shift+B | 连接/断开第一个音频设备 |
+| Ctrl+Shift+R | 刷新设备列表 |
 
-3. 编译项目
-```bash
-dotnet build
-```
-
-4. 运行项目
-```bash
-dotnet run --project src/BluetoothHeadsetManager/BluetoothHeadsetManager.csproj
-```
-
-5. 调试（在 VS Code 中）
-- 按 `F5` 启动调试
-- 或使用 `Ctrl + F5` 运行（不调试）
-
-## 项目结构
+## 📁 项目结构
 
 ```
-BluetoothHeadsetManager/
-├── src/
-│   └── BluetoothHeadsetManager/      # 主项目
-│       ├── UI/                       # 用户界面层
-│       ├── Core/                     # 业务逻辑层
-│       ├── Bluetooth/                # 蓝牙API封装
-│       ├── Models/                   # 数据模型
-│       └── Utils/                    # 工具类
-├── docs/                             # 文档
-├── plans/                            # 规划文档
-├── .vscode/                          # VS Code 配置
-└── README.md
+src/BluetoothHeadsetManager/
+├── App.xaml(.cs)           # 应用程序入口
+├── MainWindow.xaml(.cs)    # 主窗口（隐藏）
+├── Models/
+│   └── BluetoothDeviceInfo.cs   # 蓝牙设备信息模型
+├── ViewModels/
+│   └── TrayViewModel.cs         # 托盘视图模型
+├── Services/
+│   ├── BluetoothService.cs      # 蓝牙连接服务
+│   ├── BatteryService.cs        # 电量读取服务
+│   ├── AudioSwitchService.cs    # 音频切换服务
+│   └── HotkeyService.cs         # 全局热键服务
+└── Resources/
+    └── app.ico                   # 应用程序图标
 ```
 
-## 构建发布版本
+## 🔧 开发参考
 
-```bash
-# 发布单文件可执行程序
-dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true
+本项目参考了以下开源项目：
 
-# 输出位置
-# src/BluetoothHeadsetManager/bin/Release/net7.0-windows/win-x64/publish/
-```
+- [32feet](https://github.com/inthehand/32feet) - 蓝牙通信库
+- [BlueGauge](https://github.com/iKineticate/BlueGauge) - 蓝牙电量读取
+- [SoundSwitch](https://github.com/Belphemur/SoundSwitch) - 音频设备切换
+- [ToothTray](https://github.com/m2jean/ToothTray) - 托盘蓝牙管理
+- [EarTrumpet](https://github.com/File-New-Project/EarTrumpet) - WPF UI 参考
 
-## 功能路线图
+## 📄 许可证
 
-### v1.0 (当前开发中)
-- [x] 项目环境准备
-- [ ] 系统托盘UI
-- [ ] 蓝牙设备扫描
-- [ ] 设备连接/断开
-- [ ] 电量监控
-- [ ] 配置管理
+MIT License - 详见 [LICENSE](LICENSE) 文件
 
-### v2.0 (计划中)
-- [ ] 多设备管理
-- [ ] 音频路由控制
-- [ ] 蓝牙编码格式显示
+## 🤝 贡献
 
-## 贡献
+欢迎提交 Issue 和 Pull Request！
 
-欢迎贡献代码和提出建议！
+## 📋 待办事项
 
-## 许可证
-
-[MIT License](LICENSE)
-
-## 相关文档
-
-- [技术方案](plans/bluetooth-headset-manager.md)
-- [实施计划](plans/implementation-plan.md)
-- [VS Code 开发指南](plans/vscode-development-guide.md)
-- [环境配置指南](docs/setup-guide.md)
+- [ ] 添加 WPF-UI 皮肤库实现 Win11 Fluent 风格
+- [ ] 添加 LiveCharts 图表显示电量历史
+- [ ] 添加设置页面配置热键
+- [ ] 添加开机自启动选项
+- [ ] 支持特定耳机的高级功能（如降噪模式）
