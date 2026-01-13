@@ -4,6 +4,5 @@
              xmlns:local="clr-namespace:BluetoothHeadsetManager"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-         
     </Application.Resources>
 </Application>

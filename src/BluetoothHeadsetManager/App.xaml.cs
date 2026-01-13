@@ -26,7 +26,7 @@ namespace BluetoothHeadsetManager
             // 创建托盘图标
             _taskbarIcon = new TaskbarIcon
             {
-                Icon = new System.Drawing.Icon("Resources/app.ico"),
+                Icon = new System.Drawing.Icon(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Resources/app.ico")),
                 ToolTipText = "蓝牙耳机管理器",
                 DataContext = _viewModel
             };
@@ -34,17 +34,75 @@ namespace BluetoothHeadsetManager
             // 创建右键菜单
             _taskbarIcon.ContextMenu = CreateContextMenu();
 
-            // 监听设备列表变化，更新菜单
-            _viewModel.Devices.CollectionChanged += (s, args) =>
+            // 订阅设备列表变化事件，刷新菜单
+            _viewModel.PropertyChanged += (s, args) =>
             {
-                Dispatcher.Invoke(() =>
+                if (args.PropertyName == nameof(TrayViewModel.Devices))
                 {
-                    _taskbarIcon.ContextMenu = CreateContextMenu();
-                });
+                    Dispatcher.Invoke(() => _taskbarIcon.ContextMenu = CreateContextMenu());
+                }
             };
 
             // 初始化热键服务
             InitializeHotkeys();
+        }
+
+        private ContextMenu CreateContextMenu()
+        {
+            var menu = new ContextMenu();
+
+            // 刷新按钮
+            var refreshItem = new MenuItem { Header = "🔄 刷新设备列表" };
+            refreshItem.Click += async (s, args) =>
+            {
+                if (_viewModel != null)
+                {
+                    await _viewModel.RefreshDevicesCommand.ExecuteAsync(null);
+                    _taskbarIcon!.ContextMenu = CreateContextMenu();
+                }
+            };
+            menu.Items.Add(refreshItem);
+            menu.Items.Add(new Separator());
+
+            // 设备列表
+            if (_viewModel != null && _viewModel.Devices.Count > 0)
+            {
+                foreach (var device in _viewModel.Devices)
+                {
+                    var deviceItem = new MenuItem
+                    {
+                        Header = FormatDeviceHeader(device)
+                    };
+                    deviceItem.Click += async (s, args) =>
+                    {
+                        await _viewModel.ToggleConnectionCommand.ExecuteAsync(device);
+                        _taskbarIcon!.ContextMenu = CreateContextMenu();
+                    };
+                    menu.Items.Add(deviceItem);
+                }
+            }
+            else
+            {
+                var noDeviceItem = new MenuItem { Header = "没有找到蓝牙设备", IsEnabled = false };
+                menu.Items.Add(noDeviceItem);
+            }
+
+            menu.Items.Add(new Separator());
+
+            // 退出按钮
+            var exitItem = new MenuItem { Header = "退出" };
+            exitItem.Click += (s, args) => Shutdown();
+            menu.Items.Add(exitItem);
+
+            return menu;
+        }
+
+        private string FormatDeviceHeader(BluetoothDeviceInfo device)
+        {
+            var status = device.IsConnected ? "🟢" : "⚪";
+            var battery = device.BatteryLevel > 0 ? $" 🔋{device.BatteryLevel}%" : "";
+            var audioTag = device.IsAudioDevice ? " 🎧" : "";
+            return $"{status} {device.Name}{battery}{audioTag}";
         }
 
         private void InitializeHotkeys()
@@ -88,101 +146,6 @@ namespace BluetoothHeadsetManager
                 });
         }
 
-        private ContextMenu CreateContextMenu()
-        {
-            var contextMenu = new ContextMenu();
-
-            // 添加设备列表
-            if (_viewModel?.Devices.Count > 0)
-            {
-                foreach (var device in _viewModel.Devices)
-                {
-                    var deviceItem = new MenuItem
-                    {
-                        Header = device.ToString(),
-                        IsCheckable = false,
-                        Tag = device
-                    };
-                    
-                    if (device.IsConnected)
-                    {
-                        deviceItem.FontWeight = FontWeights.Bold;
-                        deviceItem.Header = "✓ " + device.ToString();
-                    }
-
-                    // 点击设备项时切换连接状态
-                    deviceItem.Click += async (s, args) =>
-                    {
-                        if (s is MenuItem menuItem && menuItem.Tag is BluetoothDeviceInfo dev)
-                        {
-                            await _viewModel.ToggleConnectionCommand.ExecuteAsync(dev);
-                        }
-                    };
-
-                    contextMenu.Items.Add(deviceItem);
-                }
-
-                contextMenu.Items.Add(new Separator());
-            }
-            else
-            {
-                var noDeviceItem = new MenuItem
-                {
-                    Header = "未发现蓝牙设备",
-                    IsEnabled = false
-                };
-                contextMenu.Items.Add(noDeviceItem);
-                contextMenu.Items.Add(new Separator());
-            }
-
-            // 刷新按钮
-            var refreshItem = new MenuItem { Header = "🔄 刷新设备列表 (Ctrl+Shift+R)" };
-            refreshItem.Click += async (s, args) =>
-            {
-                if (_viewModel != null)
-                {
-                    await _viewModel.RefreshDevicesCommand.ExecuteAsync(null);
-                }
-            };
-            contextMenu.Items.Add(refreshItem);
-
-            contextMenu.Items.Add(new Separator());
-
-            // 自动切换音频选项
-            var autoSwitchItem = new MenuItem
-            {
-                Header = "🔊 自动切换音频输出",
-                IsCheckable = true,
-                IsChecked = _viewModel?.AutoSwitchAudio ?? true
-            };
-            autoSwitchItem.Click += (s, args) =>
-            {
-                if (_viewModel != null)
-                {
-                    _viewModel.AutoSwitchAudio = autoSwitchItem.IsChecked;
-                }
-            };
-            contextMenu.Items.Add(autoSwitchItem);
-
-            contextMenu.Items.Add(new Separator());
-
-            // 热键提示
-            var hotkeyInfoItem = new MenuItem
-            {
-                Header = "⌨️ 热键: Ctrl+Shift+B 连接/断开",
-                IsEnabled = false
-            };
-            contextMenu.Items.Add(hotkeyInfoItem);
-
-            contextMenu.Items.Add(new Separator());
-
-            // 退出按钮
-            var exitItem = new MenuItem { Header = "❌ 退出" };
-            exitItem.Click += (s, args) => Shutdown();
-            contextMenu.Items.Add(exitItem);
-
-            return contextMenu;
-        }
 
         protected override void OnExit(ExitEventArgs e)
         {
